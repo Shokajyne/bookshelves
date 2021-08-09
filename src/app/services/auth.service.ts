@@ -42,7 +42,7 @@ export class AuthService {
     );
   }
 
-  signOur() {
+  signOut() {
     firebase.auth().signOut();
   }
 }
