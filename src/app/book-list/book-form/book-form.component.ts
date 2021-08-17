@@ -16,6 +16,10 @@ export class BookFormComponent implements OnInit {
     author: ['', Validators.required]
   });;
 
+  fileIsUploading: boolean = false;
+  fileUrl: string = "";
+  fileUploaded: boolean = false;
+
   constructor(private formBuilder: FormBuilder,
               private bookService: BooksService,
               private router: Router) { }
@@ -30,8 +34,31 @@ export class BookFormComponent implements OnInit {
       formValue['author']
     );
 
+    if(this.fileUrl && this.fileUrl !== '') {
+      newBook.photo = this.fileUrl;
+    }
+
     this.bookService.createNewBook(newBook);
 
     this.router.navigate(['/books']);
   }
+
+  onUploadFile(file: File) {
+    this.fileIsUploading = true;
+    this.bookService.uploadFile(file).then(
+      (url: string) => {
+        this.fileUrl = url;
+        this.fileIsUploading = false;
+        this.fileUploaded = true;
+      }
+    );
+  }
+
+  detectFiles(event: Event) {
+    if (event != null) {
+      var eventTarget = (event.target as HTMLInputElement)
+      this.onUploadFile(eventTarget!.files![0]!);
+    }
+  }
+
 }

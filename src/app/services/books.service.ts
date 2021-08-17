@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/database";
 import "firebase/firestore";
-import { Subject } from 'rxjs';
+import "firebase/storage";
+import { Observable, Subject } from 'rxjs';
 import { Book } from '../models/Book.model';
 
 @Injectable({
@@ -66,5 +68,28 @@ export class BooksService {
     this.books.splice(bookIndex, 1);
     this.saveBooks();
     this.emitBooks();
+  }
+
+  uploadFile(file: File) {
+    return new Promise<string>(
+      (resolve, reject) => {
+        const almostUniqueFilename = Date.now().toString();
+        const ref = firebase.storage().ref().child('images/' + almostUniqueFilename + file.name);
+        const upload = ref.put(file);
+
+        upload.on(firebase.storage.TaskEvent.STATE_CHANGED, 
+          () => {
+            console.log("Loading");
+          },
+          (error) => {
+            console.log(error);
+            reject();
+          },
+          () => {
+            resolve(ref.getDownloadURL());
+          }
+        );
+      }
+    );
   }
 }
