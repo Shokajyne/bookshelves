@@ -55,6 +55,19 @@ export class BooksService {
   }
 
   deleteBook(book: Book) {
+    if (book.photo) {
+      const storageRef = firebase.storage().refFromURL(book.photo);
+      storageRef.delete().then(
+        () => {
+          console.log('Deleted');
+        }
+      ).catch(
+        (error) => {
+          console.log('Error during delete ' + book.photo);
+        }
+      );
+    }
+
     const bookIndex = this.books.findIndex(
       (bookEl) => {
         if (bookEl === book) {
